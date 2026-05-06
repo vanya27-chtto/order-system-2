@@ -1,0 +1,86 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin_custom/css/admin_custom.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1 style="margin-bottom: 30px;">{{ title }}</h1>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        <!-- Карточки статистики -->
+        <div class="module" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h2>Быстрые действия</h2>
+            <table style="width: 100%;">
+                <tr>
+                    <td><a href="{% url 'admin:index' %}">Главная админки</a></td>
+                </tr>
+                <tr>
+                    <td><a href="{% url 'admin:admin_custom_adminuser_changelist' %}">Администраторы</a></td>
+                </tr>
+                <tr>
+                    <td><a href="{% url 'admin:admin_custom_auditlog_changelist' %}">Журнал аудита</a></td>
+                </tr>
+                <tr>
+                    <td><a href="{% url 'admin:password_change' %}">Изменить пароль</a></td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="module" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <h2>Информация</h2>
+            <table style="width: 100%;">
+                <tr>
+                    <td><strong>Пользователь:</strong></td>
+                    <td>{{ user.username }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Роль:</strong></td>
+                    <td>{{ user.role.name|default:"Не назначена" }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Последний вход:</strong></td>
+                    <td>{{ user.last_login|date:"d.m.Y H:i"|default:"—" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Последние действия -->
+    <div class="module" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2>Последние действия в системе</h2>
+        {% if recent_logs %}
+        <table style="width: 100%;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 12px 20px; text-align: left;">Время</th>
+                    <th style="padding: 12px 20px; text-align: left;">Администратор</th>
+                    <th style="padding: 12px 20px; text-align: left;">Действие</th>
+                    <th style="padding: 12px 20px; text-align: left;">Модель</th>
+                    <th style="padding: 12px 20px; text-align: left;">Объект</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in recent_logs %}
+                <tr>
+                    <td style="padding: 12px 20px;">{{ log.timestamp|date:"d.m.Y H:i" }}</td>
+                    <td style="padding: 12px 20px;">{{ log.admin_user.username|default:"Система" }}</td>
+                    <td style="padding: 12px 20px;">
+                        <span style="padding: 4px 8px; border-radius: 4px; background: {% if log.action == 'CREATE' %}#d4edda{% elif log.action == 'UPDATE' %}#fff3cd{% elif log.action == 'DELETE' %}#f8d7da{% else %}#d1ecf1{% endif %};">
+                            {{ log.get_action_display }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px 20px;">{{ log.model_name }}</td>
+                    <td style="padding: 12px 20px;">{{ log.object_id|default:"—" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="padding: 20px; color: #666;">Нет записей о действиях</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
