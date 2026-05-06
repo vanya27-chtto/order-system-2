@@ -1,0 +1,26 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin_custom/css/admin_custom.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}" style="color: #fff;">
+        <img src="{% static 'admin_custom/img/logo.png' %}" alt="Logo" style="height: 30px; vertical-align: middle; margin-right: 10px;">
+        Админ-панель
+    </a>
+</div>
+{% endblock %}
+
+{% block nav-global %}
+<div style="padding: 10px 20px; color: #fff;">
+    {% if user.is_authenticated %}
+        Привет, {{ user.username }} | 
+        <a href="{% url 'admin:password_change' %}" style="color: #ffc107;">Изменить пароль</a> | 
+        <a href="{% url 'admin:logout' %}" style="color: #ffc107;">Выйти</a>
+    {% endif %}
+</div>
+{% endblock %}
